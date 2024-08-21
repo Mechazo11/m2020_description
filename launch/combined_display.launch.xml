@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Set the URDF file path -->
+  <arg name="rover_urdf_file" default="$(find-pkg-share m2020_description)/rover/m2020.urdf" />
+  <arg name="heli_urdf_file" default="$(find-pkg-share m2020_description)/mhs/MHS.urdf" />
+  <arg name="manual_mode" default='true'/>
+  
+  <!-- Launch the robot state publisher -->
+  <node pkg="robot_state_publisher" 
+    exec="robot_state_publisher" 
+    name="robot_state_publisher" 
+    namespace="heli"
+    output="screen">
+    <param name='robot_description' value="$(command 'cat $(var heli_urdf_file)')"/>
+  </node>
+  
+  <node pkg="robot_state_publisher" 
+    exec="robot_state_publisher" 
+    name="robot_state_publisher" 
+    namespace="rover"
+    output="screen">
+    <param name='robot_description' value="$(command 'cat $(var rover_urdf_file)')"/>
+  </node>
+
+  
+
+  <!-- extra frames -->
+  <node name="ground_static_transform_publisher"
+          pkg="tf2_ros"
+          exec="static_transform_publisher"
+          output="screen"
+          args="0 0 0 0 0 0 ground Body_Chassis">
+  </node>
+  <node name="MHS_DebrisShield_static_transform_publisher"
+          pkg="tf2_ros"
+          exec="static_transform_publisher"
+          output="screen"
+          args="0 0 0 0 0 0 Body_MHS_DebrisShield ground">
+  </node>
+  <node name="MHS_static_transform_publisher"
+          pkg="tf2_ros"
+          exec="static_transform_publisher"
+          output="screen"
+          args="0 -1 -2.5 0 0 0 ground root">
+  </node>
+
+  <!-- Joint State Publisher Gui -->
+  <node if="$(var manual_mode)" 
+    pkg="joint_state_publisher_gui" 
+    exec="joint_state_publisher_gui" 
+    name="joint_state_publisher_gui" 
+    namespace="rover"
+  />
+  <!-- Helicopter (no control) joint state publisher -->
+  <node if="$(var manual_mode)" 
+    pkg="joint_state_publisher" 
+    exec="joint_state_publisher" 
+    name="joint_state_publisher"
+    namespace="heli" 
+  />
+
+
+  <!-- Launch RViz -->
+  <node name="rviz" pkg="rviz2" exec="rviz2" args="-d $(find-pkg-share m2020_description)/config/combined.rviz" output="screen" />
+</launch>

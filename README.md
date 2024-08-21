@@ -12,3 +12,4 @@ Credit NASA/JPL-Caltech
 
 Rover modeling and texturing by Zareh Gorjian
 
+> **Update**: structured as a ROS2 package with example launch files for `rviz2`. Try `ros2 launch m2020_description combined_display.launch.xml` to test.
